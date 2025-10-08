@@ -1,0 +1,388 @@
+.heroMain {
+  margin-left: 7%;
+  margin-right: 7%;
+  position: relative;
+  overflow: hidden;
+  height: 300px;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Carousel Slides */
+.heroCarousel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heroSlide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.8s ease-in-out;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.heroSlide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.heroSlide.prev {
+  transform: translateX(-100%);
+}
+
+/* Content Overlay */
+.heroContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 80px;
+}
+
+.sectionleft {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 50%;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+.sectionleft p {
+  position: relative;
+  padding-left: 50px;
+  color: #c22928;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.sectionleft p::before {
+  content: "";
+  display: block;
+  width: 35px;
+  height: 2px;
+  background-color: #c32929;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sectionleft h1 {
+  font-size: 70px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.1;
+  color: #1b1b1b;
+}
+
+.sectionleft span {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.heroLink {
+  display: flex;
+  margin-top: 10px;
+}
+
+.sectionleft a {
+  text-decoration: none;
+  color: black;
+  position: relative;
+  padding: 5px 0;
+}
+
+.sectionleft a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 75%;
+  border-bottom: 2px solid black;
+  transition: width 0.2s ease;
+}
+
+.sectionleft a:hover::after {
+  width: 100%;
+}
+
+.sectionleft h5 {
+  display: flex;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.sectionright {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  position: relative;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+.offerHighlight h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+  color: #1b1b1b;
+}
+
+.offerHighlight p {
+  font-size: 16px;
+  color: #666;
+  margin: 10px 0 0 0;
+}
+
+/* Carousel Controls */
+.carouselBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  color: #333;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+.carouselBtn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.carouselPrev {
+  left: 20px;
+}
+
+.carouselNext {
+  right: 20px;
+}
+
+/* Carousel Dots */
+.carouselDots {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: white;
+  transform: scale(1.4);
+}
+
+.dot:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== WHITE TEXT STYLES FOR OFFER 2 ===== */
+.sectionleft.white-text p,
+.sectionleft.white-text h1,
+.sectionleft.white-text span,
+.sectionleft.white-text h5,
+.sectionright.white-text h2,
+.sectionright.white-text p {
+  color: white;
+}
+
+.sectionleft.white-text p::before {
+  background-color: white;
+}
+
+.sectionleft.white-text a {
+  color: white;
+}
+
+.sectionleft.white-text a::after {
+  border-bottom: 2px solid white;
+}
+
+/* White controls for offer 2 */
+.carouselBtn.white-controls {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.carouselBtn.white-controls:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* White dots for offer 2 */
+.dot.white-dots {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.dot.white-dots.active {
+  background: white;
+}
+
+.dot.white-dots:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1210px) {
+  .heroMain {
+    min-height: 60vh;
+  }
+  
+  .heroContent {
+    padding: 0 40px;
+  }
+  
+  .sectionleft h1 {
+    font-size: 60px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .heroMain {
+    padding: 40px 0;
+    flex-direction: column;
+    gap: 30px;
+    min-height: auto;
+  }
+
+  .heroContent {
+    flex-direction: column;
+    padding: 0 20px;
+    gap: 30px;
+  }
+
+  .sectionleft {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    padding: 30px;
+  }
+
+  .sectionleft p {
+    padding-left: 0;
+    padding-top: 25px;
+  }
+
+  .sectionleft p::before {
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 20px;
+  }
+
+  .sectionleft h1 {
+    font-size: 50px;
+  }
+
+  .sectionright {
+    width: 100%;
+    padding: 25px;
+  }
+
+  .carouselBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .carouselPrev {
+    left: 15px;
+  }
+
+  .carouselNext {
+    right: 15px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .heroMain {
+    margin-left: 3%;
+    margin-right: 3%;
+  }
+
+  .sectionleft h1 {
+    font-size: 40px;
+  }
+
+  .sectionleft p {
+    font-size: 14px;
+  }
+
+  .sectionleft span {
+    font-size: 16px;
+  }
+
+  .sectionleft, .sectionright {
+    padding: 20px;
+  }
+
+  .carouselBtn {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+  }
+
+  .carouselPrev {
+    left: 10px;
+  }
+
+  .carouselNext {
+    right: 10px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+}
