@@ -6,6 +6,9 @@ import About from "./pages/users/About";
 import Contact from "./pages/users/Contact";
 import Profile from "./pages/users/Profile";
 import Cart from "./pages/users/Cart";
+import Electronics from "./pages/Products/Electronics/Electronics";
+import HomeAppliances from './pages/Products/HomeApplicane/HomeApplicane';
+import ProductDetail from "./pages/Products/ProductInfo/ProductDetail";
 function App() {
   return (
     <Router>
@@ -16,6 +19,9 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/cart" element={<Cart />} />
+       <Route path="/electronics" element={<Electronics/>} />
+       <Route path="/homeappliances" element={<HomeAppliances/>} />
+      <Route path="/productdetail/:productId"  element={<ProductDetail/>} />
       </Routes>
     </Router>
   );

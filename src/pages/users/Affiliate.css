@@ -1,0 +1,561 @@
+/* AffiliateProgram.css */
+
+.affiliateProgram {
+  padding: 0 160px;
+  margin-top: 30px;
+  margin-left: 140px;
+  margin-right: 60px;
+}
+
+.affiliateMain {
+  display: flex;
+  gap: 30px;
+}
+
+.affiliate__left {
+  width: 27%;
+}
+
+/* Affiliate Right Section */
+
+.affiliate__right {
+  width: 77%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 12px;
+  gap: 40px;
+}
+
+.affiliateHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.affiliateBreadcrumbLink a {
+  text-decoration: none;
+  color: black;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 14px;
+  position: relative;
+  display: inline-block;
+}
+
+.affiliateBreadcrumbLink a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0;
+  border-bottom: 2px solid black;
+  transition: width 0.3s ease;
+}
+
+.affiliateBreadcrumbLink a:hover::after {
+  width: 100%;
+}
+
+.filterLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  display: none;
+}
+
+.filterLeft p {
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Affiliate Hero Section */
+
+.affiliateHero {
+  background-color: #faf9f8;
+  padding: 40px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.affiliateHero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.affiliateHero p {
+  font-size: 1.1rem;
+  color: #767676;
+  max-width: 700px;
+  margin: 0 auto 30px;
+}
+
+.affiliateStats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 40px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat h3 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.stat p {
+  font-size: 0.9rem;
+  color: #767676;
+  margin: 0;
+}
+
+/* Affiliate Section */
+
+.affiliateSection {
+  padding: 40px 0;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.affiliateSection:last-of-type {
+  border-bottom: none;
+}
+
+.affiliateSection h2 {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+/* Benefits Grid */
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.benefitCard {
+  background-color: #faf9f8;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.benefitCard:hover {
+  transform: translateY(-5px);
+}
+
+.benefitIcon {
+  font-size: 2.5rem;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.benefitCard h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.benefitCard p {
+  color: #767676;
+  line-height: 1.6;
+}
+
+/* Steps Container */
+
+.stepsContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+}
+
+.stepNumber {
+  width: 50px;
+  height: 50px;
+  background-color: #000;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.step h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.step p {
+  color: #767676;
+  line-height: 1.6;
+}
+
+/* Commission Table */
+
+.commissionTable {
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.tableHeader {
+  display: flex;
+  background-color: #faf9f8;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.headerCell {
+  flex: 1;
+  padding: 15px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.tableRow {
+  display: flex;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableCell {
+  flex: 1;
+  padding: 15px;
+  text-align: center;
+}
+
+.tableRow.highlight {
+  background-color: #faf9f8;
+  font-weight: 500;
+}
+
+.commissionNote {
+  color: #767676;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Requirements List */
+
+.requirementsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.requirementItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.checkIcon {
+  color: #07bc0c;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.requirementItem p {
+  color: #767676;
+  margin: 0;
+}
+
+/* Affiliate Form */
+
+.affiliateForm {
+  max-width: 800px;
+}
+
+.formRow {
+  display: flex;
+  gap: 20px;
+}
+
+.formGroup {
+  margin-bottom: 25px;
+  flex: 1;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e4e4e4;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.formCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.formCheckbox input {
+  margin-top: 5px;
+}
+
+.formCheckbox label {
+  font-weight: normal;
+  line-height: 1.5;
+}
+
+.formCheckbox a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.submitButton {
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #333;
+}
+
+/* Navigation */
+
+.affiliateNavigation h3 {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.affiliateNavigation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.affiliateNavigation li {
+  margin-bottom: 15px;
+}
+
+.affiliateNavigation a {
+  color: #767676;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.affiliateNavigation a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0;
+  border-bottom: 2px solid black;
+  transition: width 0.3s ease;
+}
+
+.affiliateNavigation a:hover {
+  color: #000;
+}
+
+.affiliateNavigation a:hover::after {
+  width: 100%;
+}
+
+/* Drawer */
+
+.filterDrawer {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  background-color: white;
+  transition: right 0.3s ease;
+  z-index: 1000;
+}
+
+.filterDrawer.open {
+  right: 0;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #faf9f8;
+  padding: 28px 20px;
+}
+
+.drawerHeader p {
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.closeButton {
+  cursor: pointer;
+}
+
+.drawerContent {
+  padding: 20px;
+  height: calc(100% - 130px);
+  overflow-y: auto;
+}
+
+.affiliateNavigation.mobile {
+  display: block;
+}
+
+/* Responsive */
+
+@media screen and (max-width: 1210px) {
+  .affiliateProgram {
+    padding: 0 60px;
+    margin-top: 0;
+  }
+  
+  .affiliateStats {
+    gap: 40px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .affiliate__left {
+    display: none;
+  }
+
+  .affiliate__right {
+    width: 100%;
+  }
+  
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stepsContainer {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .filterDrawer {
+    right: -750px;
+    width: 440px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .affiliateHero h1 {
+    font-size: 2rem;
+  }
+  
+  .affiliateStats {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .formRow {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .affiliateBreadcrumbLink {
+    display: none;
+  }
+
+  .filterLeft {
+    display: flex;
+  }
+
+  .filterDrawer {
+    right: -750px;
+    width: 420px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .affiliateProgram {
+    padding: 0 15px;
+  }
+  
+  .affiliate__right {
+    width: 100%;
+    gap: 30px;
+  }
+  
+  .affiliateHero {
+    padding: 30px 20px;
+  }
+  
+  .affiliateSection {
+    padding: 30px 0;
+  }
+  
+  .tableHeader, .tableRow {
+    flex-direction: column;
+  }
+  
+  .headerCell, .tableCell {
+    padding: 10px;
+  }
+  
+  .filterDrawer {
+    right: -440px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .affiliateHero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .affiliateSection h2 {
+    font-size: 1.5rem;
+  }
+  
+  .benefitCard {
+    padding: 20px;
+  }
+}

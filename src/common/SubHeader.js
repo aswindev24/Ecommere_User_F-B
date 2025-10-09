@@ -24,7 +24,7 @@ const SubHeader = () => {
     { 
       id: "electronics", 
       name: "Electronics", 
-      path: "/category/electronics",
+      path: "/electronics",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <rect x="2" y="6" width="20" height="12" rx="2"></rect>
@@ -35,7 +35,7 @@ const SubHeader = () => {
     { 
       id: "home-appliances", 
       name: "Home Appliances", 
-      path: "/category/home-appliances",
+      path: "/homeappliances",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
