@@ -1,0 +1,357 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.register-wrapper {
+    display: flex;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: white;
+}
+
+/* Left Image Section */
+.register-image-section {
+    flex: 1;
+    background-image: url('../../Assets/CommonImages/Login_wall.jpg');
+    /* Your image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    /* Dark overlay for better text readability */
+    z-index: 1;
+}
+
+.image-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+
+.image-content h2 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    animation: slideInDown 0.8s ease-out;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.image-content p {
+    font-size: 20px;
+    opacity: 0.9;
+    animation: slideInUp 0.8s ease-out;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Right Form Section */
+.register-form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: #f9f9f9;
+    overflow-y: auto;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.register-header p {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Modern Form Styling */
+.modern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group input,
+.input-group select {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #333;
+    padding: 12px 0;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.input-group input::placeholder {
+    color: #999;
+}
+
+.input-group select {
+    cursor: pointer;
+    appearance: none;
+    padding-right: 20px;
+}
+
+.input-group select option {
+    color: #333;
+    background: white;
+}
+
+.input-group .underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus+.underline,
+.input-group select:focus+.underline {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.input-group input:not(:placeholder-shown)+.underline,
+.input-group select:not(:invalid)+.underline {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Submit Button */
+.submit-button {
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    margin-top: 20px;
+}
+
+.submit-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.submit-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.register-footer {
+    text-align: center;
+}
+
+.register-footer p {
+    font-size: 14px;
+    color: #666;
+}
+
+.login-link {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.login-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .register-image-section {
+        flex: 0.8;
+    }
+
+    .image-content h2 {
+        font-size: 36px;
+    }
+
+    .image-content p {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .register-wrapper {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .register-image-section {
+        flex: 0;
+        min-height: 200px;
+    }
+
+    .register-form-section {
+        flex: 1;
+        padding: 30px 20px;
+        overflow-y: auto;
+    }
+
+    .form-container {
+        max-width: 100%;
+    }
+
+    .register-header h1 {
+        font-size: 28px;
+    }
+
+    .register-header p {
+        font-size: 14px;
+    }
+
+    .image-content h2 {
+        font-size: 28px;
+    }
+
+    .image-content p {
+        font-size: 14px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-form-section {
+        padding: 20px 15px;
+    }
+
+    .register-header {
+        margin-bottom: 30px;
+    }
+
+    .register-header h1 {
+        font-size: 24px;
+    }
+
+    .modern-form {
+        gap: 25px;
+        margin-bottom: 20px;
+    }
+
+    .input-group input,
+    .input-group select {
+        font-size: 14px;
+        padding: 10px 0;
+    }
+
+    .submit-button {
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
