@@ -1,97 +1,105 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Cart.css';
-
-import Header  from '../../common/Header';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Header from '../../common/Header';
 import Footer from '../../common/Footer';
+import RazorpayPayment from '../../components/Payment/RazorpayPayment';
+import CouponSection from '../../common/Coupon';
+
 const Cart = () => {
-  const [deliveryInfo, setDeliveryInfo] = useState({
-    houseName: '',
-    address: '',
-    phoneNumber: '',
-    pincode: ''
-  });
-  const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [hasLocation, setHasLocation] = useState(false);
-  
-  const [couponCode, setCouponCode] = useState('');
+  const [cart, setCart] = useState(null);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState('');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [couponError, setCouponError] = useState('');
 
-  // Available coupons
-  const availableCoupons = [
-    { code: 'SAVE10', discount: 10, type: 'percentage', description: '10% off on all items' },
-    { code: 'SAVE20', discount: 20, type: 'percentage', description: '20% off on all items' },
-    { code: 'FLAT50', discount: 50, type: 'fixed', description: '$50 off on orders' },
-    { code: 'WELCOME15', discount: 15, type: 'percentage', description: '15% off for new customers' }
-  ];
+  const navigate = useNavigate();
 
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Wireless Bluetooth Headphones',
-      price: 99.99,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-      category: 'Electronics'
-    },
-    {
-      id: 2,
-      name: 'Cotton T-Shirt',
-      price: 29.99,
-      quantity: 2,
-      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
-      category: 'Clothing'
-    },
-    {
-      id: 3,
-      name: 'Sports Running Shoes',
-      price: 79.99,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
-      category: 'Footwear'
+  useEffect(() => {
+    fetchCart();
+    fetchAddresses();
+  }, []);
+
+  const fetchCart = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/cart', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setCart(response.data.cart);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+      setError('Failed to load cart');
+      setLoading(false);
     }
-  ]);
-
-  const handleRemoveFromCart = (itemId) => {
-    setCartItems(cartItems.filter(item => item.id !== itemId));
   };
 
-  const handleQuantityChange = (itemId, newQuantity) => {
+  const fetchAddresses = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/addresses', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAddresses(response.data);
+      if (response.data.length > 0) {
+        setSelectedAddressId(response.data[0]._id);
+      }
+    } catch (err) {
+      console.error('Error fetching addresses:', err);
+    }
+  };
+
+  const handleRemoveFromCart = async (itemId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.delete(`http://localhost:5000/api/cart/remove/${itemId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setCart(response.data.cart);
+        showNotification('Item removed from cart');
+      }
+    } catch (err) {
+      console.error('Error removing item:', err);
+      showNotification('Failed to remove item', true);
+    }
+  };
+
+  const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(cartItems.map(item =>
-      item.id === itemId ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-
-  const handleLocationSave = () => {
-    if (deliveryInfo.houseName.trim() && deliveryInfo.address.trim() && 
-        deliveryInfo.phoneNumber.trim() && deliveryInfo.pincode.trim()) {
-      setIsEditingLocation(false);
-      setHasLocation(true);
-    } else {
-      alert('Please fill all delivery details');
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `http://localhost:5000/api/cart/update/${itemId}`,
+        { quantity: newQuantity },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        setCart(response.data.cart);
+      }
+    } catch (err) {
+      console.error('Error updating quantity:', err);
+      showNotification('Failed to update quantity', true);
     }
-  };
-
-  const handleDeliveryInfoChange = (field, value) => {
-    setDeliveryInfo(prev => ({
-      ...prev,
-      [field]: value
-    }));
   };
 
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    if (!cart || !cart.items) return 0;
+    return cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const calculateDiscount = () => {
-    if (!appliedCoupon) return 0;
-    const subtotal = calculateSubtotal();
-    if (appliedCoupon.type === 'percentage') {
-      return (subtotal * appliedCoupon.discount) / 100;
-    } else {
-      return appliedCoupon.discount;
-    }
+    if (!appliedCoupon || !appliedCoupon.discountAmount) return 0;
+    return appliedCoupon.discountAmount;
   };
 
   const calculateTax = () => {
@@ -104,126 +112,127 @@ const Cart = () => {
     return calculateSubtotal() - calculateDiscount() + calculateTax();
   };
 
-  const handleApplyCoupon = () => {
-    setCouponError('');
-    const coupon = availableCoupons.find(c => c.code.toLowerCase() === couponCode.toLowerCase());
-    if (coupon) {
-      setAppliedCoupon(coupon);
-      setCouponCode('');
-    } else {
-      setCouponError('Invalid coupon code');
-    }
+  const handleCouponApplied = (coupon) => {
+    setAppliedCoupon(coupon);
+    showNotification('Coupon applied successfully');
   };
 
-  const handleSelectCoupon = (e) => {
-    const selectedCode = e.target.value;
-    if (selectedCode) {
-      const coupon = availableCoupons.find(c => c.code === selectedCode);
-      setAppliedCoupon(coupon);
-      setCouponError('');
-    }
-  };
-
-  const handleRemoveCoupon = () => {
+  const handleCouponRemoved = () => {
     setAppliedCoupon(null);
-    setCouponCode('');
-    setCouponError('');
+    showNotification('Coupon removed');
   };
 
   const handlePlaceOrder = () => {
-    if (!hasLocation) {
-      alert('Please add a delivery location before placing order');
+    if (addresses.length === 0) {
+      showNotification('Please add a delivery address first', true);
+      setTimeout(() => {
+        navigate('/profile');
+      }, 1500);
       return;
     }
-    if (cartItems.length === 0) {
-      alert('Your cart is empty');
+    if (!selectedAddressId) {
+      showNotification('Please select a delivery address', true);
       return;
     }
-    alert(`Order placed successfully! Total: $${calculateTotal().toFixed(2)}`);
+    if (!cart || cart.items.length === 0) {
+      showNotification('Your cart is empty', true);
+      return;
+    }
+
+    setShowPaymentModal(true);
   };
+
+  const handlePaymentSuccess = (order) => {
+    setShowPaymentModal(false);
+    showNotification('Payment successful! Order placed.');
+    setTimeout(() => {
+      navigate('/profile');
+    }, 1500);
+  };
+
+  const handlePaymentFailure = (errorMessage) => {
+    setShowPaymentModal(false);
+    showNotification(errorMessage || 'Payment failed. Please try again.', true);
+  };
+
+  const handlePaymentClose = () => {
+    setShowPaymentModal(false);
+  };
+
+  const showNotification = (message, isError = false) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
+  const selectedAddress = addresses.find(addr => addr._id === selectedAddressId);
+
+  if (loading) return <div className="cart-page"><Header /><div className="cart-container"><h2>Loading...</h2></div><Footer /></div>;
+  if (error) return <div className="cart-page"><Header /><div className="cart-container"><h2>{error}</h2></div><Footer /></div>;
 
   return (
     <div className="cart-page">
-      {/* Header */}
-      <Header/>
+      <Header />
 
-      {/* Main Content */}
+      {notification && (
+        <div className="notification">
+          {notification}
+        </div>
+      )}
+
       <div className="cart-container">
         <h2>SHOPPING CART</h2>
 
         <div className="cart-content">
-          {/* Left Section - Cart Items */}
           <div className="cart-left-section">
-            {/* Delivery Location */}
             <div className="delivery-section">
               <div className="delivery-header">
                 <h4>DELIVERY LOCATION</h4>
-                {!isEditingLocation && (
-                  <button 
-                    onClick={() => setIsEditingLocation(true)}
-                    className="edit-location-btn"
-                  >
-                    {hasLocation ? 'CHANGE' : 'ADD LOCATION'}
-                  </button>
-                )}
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="edit-location-btn"
+                >
+                  MANAGE ADDRESSES
+                </button>
               </div>
-              
-              {isEditingLocation ? (
-                <div className="location-form">
-                  <input
-                    type="text"
-                    placeholder="House Name / Flat No."
-                    value={deliveryInfo.houseName}
-                    onChange={(e) => handleDeliveryInfoChange('houseName', e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Address"
-                    value={deliveryInfo.address}
-                    onChange={(e) => handleDeliveryInfoChange('address', e.target.value)}
-                  />
-                  <div className="location-form-row">
-                    <input
-                      type="tel"
-                      placeholder="Phone Number"
-                      value={deliveryInfo.phoneNumber}
-                      onChange={(e) => handleDeliveryInfoChange('phoneNumber', e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Pincode"
-                      value={deliveryInfo.pincode}
-                      onChange={(e) => handleDeliveryInfoChange('pincode', e.target.value)}
-                    />
-                  </div>
-                  <button 
-                    onClick={handleLocationSave}
-                    className="save-location-btn"
+
+              {addresses.length > 0 ? (
+                <div className="address-selection">
+                  <select
+                    value={selectedAddressId}
+                    onChange={(e) => setSelectedAddressId(e.target.value)}
+                    className="address-select"
                   >
-                    SAVE
-                  </button>
+                    {addresses.map(address => (
+                      <option key={address._id} value={address._id}>
+                        {address.houseName}, {address.street}, {address.city} - {address.pincode}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedAddress && (
+                    <div className="location-display">
+                      <p><strong>House/Flat:</strong> {selectedAddress.houseName}</p>
+                      <p><strong>Street:</strong> {selectedAddress.street}</p>
+                      <p><strong>City:</strong> {selectedAddress.city}</p>
+                      <p><strong>State:</strong> {selectedAddress.state}</p>
+                      <p><strong>Pincode:</strong> {selectedAddress.pincode}</p>
+                      <p><strong>Phone:</strong> {selectedAddress.phoneNumber}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="location-display">
-                  {hasLocation ? (
-                    <>
-                      <p><strong>House/Flat:</strong> {deliveryInfo.houseName}</p>
-                      <p><strong>Address:</strong> {deliveryInfo.address}</p>
-                      <p><strong>Phone:</strong> {deliveryInfo.phoneNumber}</p>
-                      <p><strong>Pincode:</strong> {deliveryInfo.pincode}</p>
-                    </>
-                  ) : (
-                    <p className="no-location">No delivery location added</p>
-                  )}
+                  <p className="no-location">No delivery addresses found</p>
+                  <button onClick={() => navigate('/profile')} className="add-address-btn">
+                    ADD ADDRESS
+                  </button>
                 </div>
               )}
             </div>
 
-            {/* Cart Items Table */}
-            {cartItems.length === 0 ? (
+            {!cart || cart.items.length === 0 ? (
               <div className="cart-empty">
                 <p>YOUR CART IS EMPTY</p>
-                <button>CONTINUE SHOPPING</button>
+                <button onClick={() => navigate('/electronics')}>CONTINUE SHOPPING</button>
               </div>
             ) : (
               <table className="cart-table">
@@ -237,16 +246,21 @@ const Cart = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {cartItems.map(item => (
-                    <tr key={item.id}>
+                  {cart.items.map(item => (
+                    <tr key={item._id}>
                       <td>
                         <div className="product-info">
                           <div className="product-image">
-                            <img src={item.image} alt={item.name} />
+                            <img
+                              src={item.product.images && item.product.images.length > 0
+                                ? `http://localhost:5000${item.product.images[0]}`
+                                : 'https://via.placeholder.com/100'}
+                              alt={item.product.name}
+                            />
                           </div>
                           <div className="product-details">
-                            <h4>{item.name}</h4>
-                            <p>{item.category}</p>
+                            <h4>{item.product.name}</h4>
+                            <p>{item.product.category?.name}</p>
                           </div>
                         </div>
                       </td>
@@ -255,19 +269,19 @@ const Cart = () => {
                       </td>
                       <td>
                         <div className="quantity-control">
-                          <button 
-                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                          <button
+                            onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
                             disabled={item.quantity <= 1}
                           >
                             −
                           </button>
-                          <input 
+                          <input
                             type="text"
                             value={item.quantity}
                             readOnly
                           />
-                          <button 
-                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                          <button
+                            onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
                           >
                             +
                           </button>
@@ -277,8 +291,8 @@ const Cart = () => {
                         ${(item.price * item.quantity).toFixed(2)}
                       </td>
                       <td>
-                        <button 
-                          onClick={() => handleRemoveFromCart(item.id)}
+                        <button
+                          onClick={() => handleRemoveFromCart(item._id)}
                           className="remove-btn"
                         >
                           ×
@@ -291,67 +305,17 @@ const Cart = () => {
             )}
           </div>
 
-          {/* Right Section - Order Summary */}
-          {cartItems.length > 0 && (
+          {cart && cart.items.length > 0 && (
             <div className="order-summary">
               <h3>ORDER SUMMARY</h3>
-              
-              {/* Coupon Section */}
-              <div className="coupon-section">
-                <h4>HAVE A COUPON?</h4>
-                
-                {!appliedCoupon ? (
-                  <>
-                    <div className="coupon-input-group">
-                      <input
-                        type="text"
-                        placeholder="Enter coupon code"
-                        value={couponCode}
-                        onChange={(e) => {
-                          setCouponCode(e.target.value.toUpperCase());
-                          setCouponError('');
-                        }}
-                        className="coupon-input"
-                      />
-                      <button 
-                        onClick={handleApplyCoupon}
-                        className="apply-coupon-btn"
-                        disabled={!couponCode.trim()}
-                      >
-                        APPLY
-                      </button>
-                    </div>
-                    {couponError && <p className="coupon-error">{couponError}</p>}
-                    
-                    <div className="coupon-divider">
-                      <span>OR</span>
-                    </div>
-                    
-                    <div className="coupon-select-group">
-                      <label>SELECT FROM AVAILABLE COUPONS</label>
-                      <select onChange={handleSelectCoupon} defaultValue="">
-                        <option value="">Choose a coupon</option>
-                        {availableCoupons.map(coupon => (
-                          <option key={coupon.code} value={coupon.code}>
-                            {coupon.code} - {coupon.description}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </>
-                ) : (
-                  <div className="applied-coupon">
-                    <div className="applied-coupon-info">
-                      <p><strong>{appliedCoupon.code}</strong> applied</p>
-                      <p className="coupon-desc">{appliedCoupon.description}</p>
-                    </div>
-                    <button onClick={handleRemoveCoupon} className="remove-coupon-btn">
-                      ×
-                    </button>
-                  </div>
-                )}
-              </div>
-              
+
+              <CouponSection
+                appliedCoupon={appliedCoupon}
+                onCouponApplied={handleCouponApplied}
+                onCouponRemoved={handleCouponRemoved}
+                orderAmount={calculateSubtotal()}
+              />
+
               <table className="summary-table">
                 <tbody>
                   <tr>
@@ -375,9 +339,9 @@ const Cart = () => {
                 </tbody>
               </table>
 
-              <button 
+              <button
                 onClick={handlePlaceOrder}
-                disabled={!hasLocation}
+                disabled={false}
                 className="place-order-btn"
               >
                 PLACE ORDER
@@ -387,7 +351,24 @@ const Cart = () => {
         </div>
       </div>
 
-      <Footer/>
+      {showPaymentModal && (
+        <RazorpayPayment
+          amount={calculateTotal()}
+          orderData={{
+            addressId: selectedAddressId,
+            subtotal: calculateSubtotal(),
+            discount: calculateDiscount(),
+            tax: calculateTax(),
+            total: calculateTotal(),
+            couponCode: appliedCoupon ? appliedCoupon.code : null
+          }}
+          onSuccess={handlePaymentSuccess}
+          onFailure={handlePaymentFailure}
+          onClose={handlePaymentClose}
+        />
+      )}
+
+      <Footer />
     </div>
   );
 };

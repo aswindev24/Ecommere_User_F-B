@@ -1,12 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./Header.css";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Change to white when scrolled more than 50px
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -20,7 +39,7 @@ const Header = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="navBar">
+      <nav className={`navBar ${isScrolled ? 'scrolled' : ''}`}>
         <div className="logoLinkContainer">
           <div className="logoContainer">
             <h1 className="company-name">Lestora</h1>
@@ -52,7 +71,7 @@ const Header = () => {
           </a>
           {isAuthenticated ? (
             <>
-              <span className="user-name">Hi, {user?.firstName}</span>
+              {/* <span className="user-name">Hi, {user?.firstName}</span> */}
               <button onClick={handleLogout} className="logout-btn" aria-label="Logout">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -68,7 +87,7 @@ const Header = () => {
       </nav>
 
       {/* Mobile Navigation */}
-      <nav className="mobile-nav">
+      <nav className={`mobile-nav ${isScrolled ? 'scrolled' : ''}`}>
         <div className="logoContainer">
           <h1 className="company-name">Lestora</h1>
         </div>

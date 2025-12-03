@@ -1,71 +1,114 @@
+// Frontend/src/components/HeroSection/HeroSection.js
 import React, { useState, useEffect } from "react";
 import "./HeroSection.css";
-
-// Import images directly
-import Offer1 from "../../Assets/TodaysOffer/Offer1.jpg";
-import Offer2 from "../../Assets/TodaysOffer/Offer2.jpg";
-import Offer3 from "../../Assets/TodaysOffer/Offer3.jpg";
+import axios from 'axios';
 
 const HeroSection = () => {
   const [currentOffer, setCurrentOffer] = useState(0);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Today's offers data with direct image imports only
-  const todayOffers = [
-    { id: 1, image: Offer1 },
-    { id: 2, image: Offer2 },
-    { id: 3, image: Offer3 }
-  ];
-
-  // Auto-rotate offers
   useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/offer-images/fetch-adminOfferImages");
+
+        if (response.data.success) {
+          // Replace all URLs with correct port
+          const correctedOffers = response.data.offers.map(o => ({
+            ...o,
+            image: o.image
+          }));
+          setOffers(correctedOffers);
+        }
+      } catch (error) {
+        console.error("Error fetching offers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, []);
+
+  // Auto-rotate offers if we have more than 1
+  useEffect(() => {
+    if (offers.length <= 1) return;
+
     const interval = setInterval(() => {
-      setCurrentOffer((prev) => (prev + 1) % todayOffers.length);
+      setCurrentOffer((prev) => (prev + 1) % offers.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [offers.length]);
 
   const nextOffer = () => {
-    setCurrentOffer((prev) => (prev + 1) % todayOffers.length);
+    if (offers.length <= 1) return;
+    setCurrentOffer((prev) => (prev + 1) % offers.length);
   };
 
   const prevOffer = () => {
-    setCurrentOffer((prev) => (prev - 1 + todayOffers.length) % todayOffers.length);
+    if (offers.length <= 1) return;
+    setCurrentOffer((prev) => (prev - 1 + offers.length) % offers.length);
   };
+
+  if (loading) {
+    return (
+      <div className="heroMain">
+        <div className="loadingHero">
+          <div className="loadingSpinner"></div>
+          <p>Loading offers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (offers.length === 0) {
+    return (
+      <div className="heroMain">
+        <div className="noOffers">
+          <p>No offers available at the moment</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="heroMain">
-      {/* Background Carousel */}
       <div className="heroCarousel">
-        {todayOffers.map((offer, index) => (
+        {offers.map((offer, index) => (
           <div
-            key={offer.id}
+            key={offer._id}
             className={`heroSlide ${index === currentOffer ? 'active' : ''}`}
             style={{
               backgroundImage: `url(${offer.image})`
             }}
+            alt={offer.description || "Offer image"}
           />
         ))}
       </div>
 
-      {/* Carousel Controls */}
-      <button className="carouselBtn carouselPrev" onClick={prevOffer}>
-        ‹
-      </button>
-      <button className="carouselBtn carouselNext" onClick={nextOffer}>
-        ›
-      </button>
+      {offers.length > 1 && (
+        <>
+          <button className="carouselBtn carouselPrev" onClick={prevOffer}>‹</button>
+          <button className="carouselBtn carouselNext" onClick={nextOffer}>›</button>
+          <div className="carouselDots">
+            {offers.map((_, index) => (
+              <button
+                key={index}
+                className={`dot ${index === currentOffer ? 'active' : ''}`}
+                onClick={() => setCurrentOffer(index)}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
-      {/* Dots Indicator */}
-      <div className="carouselDots">
-        {todayOffers.map((_, index) => (
-          <button
-            key={index}
-            className={`dot ${index === currentOffer ? 'active' : ''}`}
-            onClick={() => setCurrentOffer(index)}
-          />
-        ))}
-      </div>
+      {offers[currentOffer]?.description && (
+        <div className="offerDescription">
+          <p>{offers[currentOffer].description}</p>
+        </div>
+      )}
     </div>
   );
 };

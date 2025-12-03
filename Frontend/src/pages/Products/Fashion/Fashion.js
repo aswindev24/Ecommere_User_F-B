@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../../common/Header';
 import Footer from '../../../common/Footer';
 // import './Fashion.css';
 import { useNavigate } from 'react-router-dom';
 import FashionFilter from './FashionFilter';
+import axios from 'axios';
 
 const Fashion = () => {
   const [filters, setFilters] = useState({
@@ -15,301 +16,32 @@ const Fashion = () => {
     sortBy: 'featured'
   });
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [notification, setNotification] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
-  const products = [
-    {
-      id: 1,
-      name: 'Classic Little Black Dress',
-      price: 89.99,
-      image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Zara',
-      rating: 4.7,
-      size: ['XS', 'S', 'M', 'L'],
-      color: 'Black',
-      features: ['Knee Length', 'Stretch Fabric', 'Machine Wash'],
-      description: 'Timeless little black dress perfect for any occasion. Made from premium stretch fabric for comfort and fit.',
-      specifications: {
-        'Material': '95% Polyester, 5% Spandex',
-        'Care': 'Machine Washable',
-        'Length': 'Knee Length',
-        'Neckline': 'Round Neck',
-        'Sleeves': 'Short Sleeves'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1583496661160-fb5886a13d77?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 2,
-      name: 'Floral Summer Maxi Dress',
-      price: 129.99,
-      image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'H&M',
-      rating: 4.5,
-      size: ['S', 'M', 'L', 'XL'],
-      color: 'Multicolor',
-      features: ['Floral Print', 'Flowy Fabric', 'Beach Wear'],
-      description: 'Beautiful floral maxi dress perfect for summer occasions and beach vacations.',
-      specifications: {
-        'Material': '100% Viscose',
-        'Care': 'Hand Wash Recommended',
-        'Length': 'Maxi',
-        'Neckline': 'V-Neck',
-        'Style': 'Bohemian'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 3,
-      name: 'Elegant Cocktail Dress',
-      price: 199.99,
-      image: 'https://images.unsplash.com/photo-1566479179816-d53e1a73d0d3?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Mango',
-      rating: 4.8,
-      size: ['XS', 'S', 'M'],
-      color: 'Navy Blue',
-      features: ['Silk Blend', 'Evening Wear', 'Lined'],
-      description: 'Sophisticated cocktail dress made from premium silk blend for special occasions.',
-      specifications: {
-        'Material': '80% Silk, 20% Nylon',
-        'Care': 'Dry Clean Only',
-        'Length': 'Above Knee',
-        'Neckline': 'Sweetheart',
-        'Closure': 'Hidden Zipper'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1566479179816-d53e1a73d0d3?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1581404917879-53e18431bb15?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 4,
-      name: 'Casual Cotton Shirt Dress',
-      price: 69.99,
-      image: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Uniqlo',
-      rating: 4.4,
-      size: ['XS', 'S', 'M', 'L', 'XL'],
-      color: 'White',
-      features: ['Cotton', 'Belted', 'Everyday Wear'],
-      description: 'Comfortable and versatile shirt dress perfect for casual outings and office wear.',
-      specifications: {
-        'Material': '100% Cotton',
-        'Care': 'Machine Washable',
-        'Length': 'Midi',
-        'Pockets': '2 Side Pockets',
-        'Style': 'Shirt Dress'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 5,
-      name: 'Wrap Bodycon Dress',
-      price: 79.99,
-      image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'ASOS',
-      rating: 4.6,
-      size: ['XS', 'S', 'M', 'L'],
-      color: 'Red',
-      features: ['Wrap Style', 'Bodycon Fit', 'Stretchy'],
-      description: 'Flattering wrap dress that accentuates your figure. Perfect for date nights and parties.',
-      specifications: {
-        'Material': '92% Polyester, 8% Elastane',
-        'Care': 'Machine Wash Cold',
-        'Fit': 'Bodycon',
-        'Style': 'Wrap',
-        'Occasion': 'Evening'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1542295669297-4d352b042bca?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 6,
-      name: 'Bohemian Off-Shoulder Dress',
-      price: 109.99,
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Free People',
-      rating: 4.3,
-      size: ['S', 'M', 'L'],
-      color: 'Pink',
-      features: ['Off-Shoulder', 'Ruffle Details', 'Bohemian'],
-      description: 'Chic off-shoulder dress with beautiful ruffle details for a romantic bohemian look.',
-      specifications: {
-        'Material': '100% Cotton',
-        'Care': 'Hand Wash',
-        'Sleeves': 'Off-Shoulder',
-        'Details': 'Ruffle Trim',
-        'Style': 'Bohemian'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 7,
-      name: 'Office Sheath Dress',
-      price: 149.99,
-      image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Ann Taylor',
-      rating: 4.7,
-      size: ['XS', 'S', 'M', 'L', 'XL'],
-      color: 'Navy Blue',
-      features: ['Professional', 'Pencil Cut', 'Structured'],
-      description: 'Professional sheath dress perfect for office wear and business meetings.',
-      specifications: {
-        'Material': 'Wool Blend',
-        'Care': 'Dry Clean Only',
-        'Fit': 'Sheath',
-        'Length': 'Knee Length',
-        'Style': 'Professional'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 8,
-      name: 'Knitted Sweater Dress',
-      price: 99.99,
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Aritzia',
-      rating: 4.5,
-      size: ['XS', 'S', 'M', 'L'],
-      color: 'Cream',
-      features: ['Winter Wear', 'Cozy', 'Turtleneck'],
-      description: 'Warm and cozy knitted sweater dress perfect for cold weather and winter styling.',
-      specifications: {
-        'Material': '100% Merino Wool',
-        'Care': 'Hand Wash',
-        'Neckline': 'Turtleneck',
-        'Length': 'Midi',
-        'Season': 'Winter'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 9,
-      name: 'A-Line Party Dress',
-      price: 139.99,
-      image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Reformation',
-      rating: 4.8,
-      size: ['XS', 'S', 'M'],
-      color: 'Emerald Green',
-      features: ['A-Line', 'Party Wear', 'Sequins'],
-      description: 'Stunning A-line party dress with sequin details for special celebrations and events.',
-      specifications: {
-        'Material': 'Polyester with Sequins',
-        'Care': 'Dry Clean Only',
-        'Silhouette': 'A-Line',
-        'Details': 'Sequin Embellishment',
-        'Occasion': 'Party'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1542295669297-4d352b042bca?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 10,
-      name: 'Denim Shirt Dress',
-      price: 89.99,
-      image: 'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Levi\'s',
-      rating: 4.4,
-      size: ['XS', 'S', 'M', 'L'],
-      color: 'Blue',
-      features: ['Denim', 'Casual', 'Button Front'],
-      description: 'Classic denim shirt dress that combines comfort with timeless style.',
-      specifications: {
-        'Material': '100% Cotton Denim',
-        'Care': 'Machine Washable',
-        'Style': 'Shirt Dress',
-        'Closure': 'Button Front',
-        'Pockets': '2 Front Pockets'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 11,
-      name: 'Lace Wedding Guest Dress',
-      price: 179.99,
-      image: 'https://images.unsplash.com/photo-1519690889869-e705e59f72e1?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Self-Portrait',
-      rating: 4.9,
-      size: ['XS', 'S', 'M', 'L'],
-      color: 'Ivory',
-      features: ['Lace Details', 'Wedding Guest', 'Elegant'],
-      description: 'Elegant lace dress perfect for weddings and formal events.',
-      specifications: {
-        'Material': 'Lace Overlay',
-        'Care': 'Dry Clean Only',
-        'Details': 'Lace Appliqué',
-        'Occasion': 'Formal',
-        'Length': 'Midi'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1519690889869-e705e59f72e1?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1581404917879-53e18431bb15?w=600&h=600&fit=crop'
-      ]
-    },
-    {
-      id: 12,
-      name: 'T-Shirt Dress',
-      price: 49.99,
-      image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=400&fit=crop',
-      category: 'Dresses',
-      brand: 'Gap',
-      rating: 4.2,
-      size: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-      color: 'Grey',
-      features: ['Comfortable', 'Everyday', 'Soft Fabric'],
-      description: 'Ultra-comfortable t-shirt dress perfect for casual days and running errands.',
-      specifications: {
-        'Material': '100% Cotton Jersey',
-        'Care': 'Machine Washable',
-        'Fit': 'Relaxed',
-        'Style': 'T-Shirt Dress',
-        'Occasion': 'Casual'
-      },
-      images: [
-        'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop'
-      ]
-    }
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:5000/api/products/category/Fashion');
+        if (response.data.success) {
+          setProducts(response.data.products);
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products');
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleFilterChange = (filterType, value) => {
     console.log('Filter changed:', filterType, value); // Debug log
@@ -319,22 +51,32 @@ const Fashion = () => {
     }));
   };
 
-  const handleAddToCart = (product, e) => {
-    e.stopPropagation(); // Prevent navigation when clicking add to cart
+  const handleAddToCart = async (product, e) => {
+    e.stopPropagation();
 
-    const existingItem = cartItems.find(item => item.id === product.id);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setNotification('Please login to add items to cart');
+        setTimeout(() => setNotification(''), 3000);
+        return;
+      }
 
-    if (existingItem) {
-      setCartItems(cartItems.map(item =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      ));
-    } else {
-      setCartItems([...cartItems, { ...product, quantity: 1 }]);
+      const response = await axios.post(
+        'http://localhost:5000/api/cart/add',
+        { productId: product._id, quantity: 1 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        setNotification(`${product.name} added to cart!`);
+        setTimeout(() => setNotification(''), 3000);
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      setNotification(error.response?.data?.message || 'Failed to add to cart');
+      setTimeout(() => setNotification(''), 3000);
     }
-
-    // Show notification
-    setNotification(`${product.name} added to cart!`);
-    setTimeout(() => setNotification(''), 3000);
   };
 
   const handleProductClick = (productId) => {
@@ -359,22 +101,22 @@ const Fashion = () => {
 
     // Filter by brand
     if (filters.brand !== 'all') {
-      filtered = filtered.filter(product => product.brand === filters.brand);
+      // filtered = filtered.filter(product => product.brand === filters.brand);
     }
 
     // Filter by category
     if (filters.category !== 'all') {
-      filtered = filtered.filter(product => product.category === filters.category);
+      filtered = filtered.filter(product => product.subCategory && product.subCategory.name === filters.category);
     }
 
     // Filter by size
     if (filters.size !== 'all') {
-      filtered = filtered.filter(product => product.size.includes(filters.size));
+      // filtered = filtered.filter(product => product.size && product.size.includes(filters.size));
     }
 
     // Filter by color
     if (filters.color !== 'all') {
-      filtered = filtered.filter(product => product.color === filters.color);
+      // filtered = filtered.filter(product => product.color === filters.color);
     }
 
     // Sort products
@@ -382,15 +124,24 @@ const Fashion = () => {
       filtered.sort((a, b) => a.price - b.price);
     } else if (filters.sortBy === 'price-high') {
       filtered.sort((a, b) => b.price - a.price);
-    } else if (filters.sortBy === 'rating') {
-      filtered.sort((a, b) => b.rating - a.rating);
     }
+    // else if (filters.sortBy === 'rating') {
+    //   filtered.sort((a, b) => b.rating - a.rating);
+    // }
 
     console.log('Filtered products count:', filtered.length); // Debug log
     return filtered;
   };
 
   const filteredProducts = getFilteredProducts();
+
+  // Group by SubCategory
+  const groupedProducts = filteredProducts.reduce((acc, product) => {
+    const subCatName = product.subCategory ? product.subCategory.name : 'Other';
+    if (!acc[subCatName]) acc[subCatName] = [];
+    acc[subCatName].push(product);
+    return acc;
+  }, {});
 
   const clearAllFilters = () => {
     setFilters({
@@ -402,6 +153,9 @@ const Fashion = () => {
       sortBy: 'featured'
     });
   };
+
+  if (loading) return <div className="electronics">Loading...</div>;
+  if (error) return <div className="electronics">{error}</div>;
 
   return (
     <div className="electronics">
@@ -461,52 +215,63 @@ const Fashion = () => {
             </div>
           </div>
 
-          {/* Products Grid */}
-          <div className="productsGrid">
-            {filteredProducts.map(product => (
-              <div
-                key={product.id}
-                className="productCard"
-                onClick={() => handleProductClick(product.id)}
-              >
-                <div className="productImage">
-                  <img src={product.image} alt={product.name} />
-                  <div className="productCategory">{product.category}</div>
-                  <div className="productColor">{product.color}</div>
-                </div>
-
-                <div className="productContent">
-                  <div className="productBrand">{product.brand}</div>
-                  <h3 className="productTitle">{product.name}</h3>
-
-                  <div className="productRating">
-                    <div className="stars">
-                      {'★'.repeat(Math.floor(product.rating))}
-                      {'☆'.repeat(5 - Math.floor(product.rating))}
-                    </div>
-                    <span className="ratingValue">{product.rating}</span>
-                  </div>
-
-                  <div className="productFeatures">
-                    {product.features.slice(0, 2).map((feature, index) => (
-                      <span key={index} className="featureTag">{feature}</span>
-                    ))}
-                  </div>
-
-                  <div className="sizeOptions">
-                    <span className="sizeLabel">Sizes: </span>
-                    {product.size.join(', ')}
-                  </div>
-
-                  <div className="productFooter">
-                    <div className="productPrice">${product.price.toFixed(2)}</div>
-                    <button
-                      onClick={(e) => handleAddToCart(product, e)}
-                      className="addToCartButton"
+          {/* Products Grouped by SubCategory */}
+          <div className="productsContainer">
+            {Object.entries(groupedProducts).map(([subCategory, items]) => (
+              <div key={subCategory} className="subCategorySection">
+                <h2 className="subCategoryTitle">{subCategory}</h2>
+                <div className="productsGrid">
+                  {items.map(product => (
+                    <div
+                      key={product._id}
+                      className="productCard"
+                      onClick={() => handleProductClick(product._id)}
                     >
-                      ADD TO CART
-                    </button>
-                  </div>
+                      <div className="productImage">
+                        <img src={product.images && product.images.length > 0 ? `http://localhost:5000${product.images[0]}` : 'https://via.placeholder.com/400'} alt={product.name} />
+                        <div className="productCategory">{product.category.name}</div>
+                        {/* <div className="productColor">{product.color}</div> */}
+                      </div>
+
+                      <div className="productContent">
+                        {/* <div className="productBrand">{product.brand}</div> */}
+                        <h3 className="productTitle">{product.name}</h3>
+
+                        <div className="productRating">
+                          <div className="stars">
+                            {'★'.repeat(4)}
+                            {'☆'.repeat(1)}
+                          </div>
+                          <span className="ratingValue">4.0</span>
+                        </div>
+
+                        {/* 
+                        <div className="productFeatures">
+                          {product.features.slice(0, 2).map((feature, index) => (
+                            <span key={index} className="featureTag">{feature}</span>
+                          ))}
+                        </div>
+                        */}
+
+                        {/* 
+                        <div className="sizeOptions">
+                          <span className="sizeLabel">Sizes: </span>
+                          {product.size.join(', ')}
+                        </div>
+                        */}
+
+                        <div className="productFooter">
+                          <div className="productPrice">${product.price.toFixed(2)}</div>
+                          <button
+                            onClick={(e) => handleAddToCart(product, e)}
+                            className="addToCartButton"
+                          >
+                            ADD TO CART
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}

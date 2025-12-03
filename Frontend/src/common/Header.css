@@ -1,25 +1,27 @@
 /* Desktop Navigation */
 .navBar {
-  margin-left: 7%;
-  margin-right: 7%;
+  background: rgba(255, 255, 255, 0);
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: auto;
-  height: 10px;
-  padding: 35px 160px;
-  position: relative;
-  z-index: 10;
-  background-color: white;
+  height: 60px;
+  padding: 0 160px;
   position: sticky;
   top: 0;
-  box-shadow: 0 10px 33px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: all 0.4s ease-in-out;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0);
+}
+
+.navBar.scrolled {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logoLinkContainer {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 60px;
 }
 
@@ -30,7 +32,7 @@
 }
 
 .company-name {
-  color: #1b1b1b;
+  color: black;
   font-size: 28px;
   font-weight: 700;
   margin: 0;
@@ -52,9 +54,9 @@
 
 .linkContainer ul li a {
   text-decoration: none;
-  color: #1b1b1b;
+  color: black;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   position: relative;
   transition: color 0.3s ease;
 }
@@ -66,7 +68,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background-color: #1b1b1b;
+  background-color: black;
   transition: width 0.3s ease-out;
 }
 
@@ -76,21 +78,45 @@
 }
 
 .linkContainer ul li a:hover {
-  color: #333;
+  color: #444242;
 }
 
 .iconContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 35px;
+  gap: 25px;
 }
 
-.iconContainer a {
+.iconContainer a,
+.iconContainer .user-name {
   display: flex;
   align-items: center;
-  color: #1b1b1b;
+  color: black;
   text-decoration: none;
+  font-size: 14px;
+}
+
+.iconContainer svg {
+  width: 18px;
+  height: 18px;
+  stroke: #444242;
+}
+
+.iconContainer .user-name {
+  margin-left: 10px;
+}
+
+.iconContainer .login-link,
+.iconContainer .logout-btn {
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 0px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 /* Mobile Menu Toggle Button */
@@ -99,11 +125,11 @@
   border: none;
   cursor: pointer;
   padding: 5px;
-  color: #1b1b1b;
+  color: black;
   display: none;
 }
 
-/* Mobile Navigation - Hidden by default */
+/* Mobile Navigation */
 .mobile-nav {
   display: none;
   align-items: center;
@@ -111,9 +137,15 @@
   padding: 20px 60px;
   position: relative;
   z-index: 10;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0);
   position: sticky;
   top: 0;
+  transition: all 0.4s ease-in-out;
+  box-shadow: 0 10px 33px rgba(0, 0, 0, 0);
+}
+
+.mobile-nav.scrolled {
+  background-color: rgba(255, 255, 255, 1);
   box-shadow: 0 10px 33px rgba(0, 0, 0, 0.1);
 }
 
@@ -207,12 +239,18 @@
   gap: 30px;
 }
 
-.mobile-menuFooterLogin a {
+.mobile-menuFooterLogin a,
+.mobile-menuFooterLogin button {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: black;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
 }
 
 .mobile-menuFooterLogin p {

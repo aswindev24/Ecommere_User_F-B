@@ -7,7 +7,7 @@
 .electronicsMain {
   display: flex;
   flex: 1;
-  max-width: 1400px;
+
   margin: 0 auto;
   width: 100%;
 }
@@ -71,12 +71,12 @@
   transition: all 0.2s;
 }
 
-.filterOption input[type="radio"]:checked + .checkmark {
+.filterOption input[type="radio"]:checked+.checkmark {
   border-color: #000;
   background: #000;
 }
 
-.filterOption input[type="radio"]:checked + .checkmark::after {
+.filterOption input[type="radio"]:checked+.checkmark::after {
   content: '';
   width: 6px;
   height: 6px;
@@ -215,7 +215,7 @@
 
 .productCard {
   border: 1px solid #e5e5e5;
-  border-radius: 8px;
+  border-radius: 1rem;
   overflow: hidden;
   background: white;
   cursor: pointer;
@@ -228,6 +228,7 @@
 }
 
 .productImage {
+  border-radius: 1rem;
   position: relative;
   height: 300px;
   overflow: hidden;
@@ -324,7 +325,7 @@
 }
 
 .addToCartButton {
-  background: #000;
+  background: #ff9900;
   color: white;
   border: none;
   padding: 0.75rem 1rem;
@@ -393,6 +394,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -448,26 +450,26 @@
   .electronics__left {
     display: none;
   }
-  
+
   .filterLeft {
     display: flex;
   }
-  
+
   .electronics__right {
     padding: 1rem;
   }
-  
+
   .productsHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .productsGrid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1rem;
   }
-  
+
   .filterDrawer {
     width: 100%;
   }

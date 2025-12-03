@@ -68,96 +68,31 @@ const Profile = () => {
     }
   };
 
-  const [orderHistory] = useState([
-    {
-      id: 'ORD-2024-004',
-      date: '2024-12-15',
-      total: 189.99,
-      status: 'Processing',
-      items: [
-        {
-          id: 4,
-          name: 'Smart Watch',
-          price: 149.99,
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
-          category: 'Electronics'
-        },
-        {
-          id: 5,
-          name: 'Phone Case',
-          price: 19.99,
-          quantity: 2,
-          image: 'https://images.unsplash.com/photo-1601593346740-925612772716?w=400&h=400&fit=crop',
-          category: 'Accessories'
-        }
-      ]
-    },
-    {
-      id: 'ORD-2024-001',
-      date: '2024-10-01',
-      total: 299.99,
-      status: 'Delivered',
-      items: [
-        {
-          id: 1,
-          name: 'Wireless Bluetooth Headphones',
-          price: 99.99,
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-          category: 'Electronics'
-        },
-        {
-          id: 2,
-          name: 'Cotton T-Shirt',
-          price: 29.99,
-          quantity: 2,
-          image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
-          category: 'Clothing'
-        }
-      ]
-    },
-    {
-      id: 'ORD-2024-002',
-      date: '2024-09-15',
-      total: 149.50,
-      status: 'Delivered',
-      items: [
-        {
-          id: 3,
-          name: 'Sports Running Shoes',
-          price: 79.99,
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
-          category: 'Footwear'
-        },
-        {
-          id: 1,
-          name: 'Wireless Bluetooth Headphones',
-          price: 99.99,
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-          category: 'Electronics'
-        }
-      ]
-    },
-    {
-      id: 'ORD-2024-003',
-      date: '2024-09-01',
-      total: 89.99,
-      status: 'Cancelled',
-      items: [
-        {
-          id: 2,
-          name: 'Cotton T-Shirt',
-          price: 29.99,
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
-          category: 'Clothing'
-        }
-      ]
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  useEffect(() => {
+    if (activeSection === 'orders') {
+      fetchOrders();
     }
-  ]);
+  }, [activeSection]);
+
+  const fetchOrders = async () => {
+    try {
+      setLoadingOrders(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/orders', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setOrders(response.data.orders);
+      }
+      setLoadingOrders(false);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setLoadingOrders(false);
+    }
+  };
 
   const handlePersonalInfoChange = (field, value) => {
     setPersonalInfo(prev => ({
@@ -265,9 +200,23 @@ const Profile = () => {
     }
   };
 
-  const handleCancelOrder = (orderId) => {
+  const handleCancelOrder = async (orderId) => {
     if (window.confirm('Are you sure you want to cancel this order?')) {
-      alert(`Order ${orderId} has been cancelled.`);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.put(
+          `http://localhost:5000/api/orders/${orderId}/cancel`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (response.data.success) {
+          alert('Order cancelled successfully');
+          fetchOrders();
+        }
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+        alert(error.response?.data?.message || 'Failed to cancel order');
+      }
     }
   };
 
@@ -636,109 +585,120 @@ const Profile = () => {
                 <div className="profileSection">
                   <h2>ORDER HISTORY</h2>
 
-                  <div className="ordersList">
-                    {orderHistory.map(order => {
-                      const isDelivered = order.status.toLowerCase() === 'delivered';
-                      const isCancelled = order.status.toLowerCase() === 'cancelled';
-                      const canCancel = !isDelivered && !isCancelled;
-                      const canTrack = !isCancelled;
+                  {loadingOrders ? (
+                    <p>Loading orders...</p>
+                  ) : orders.length === 0 ? (
+                    <p>No orders found.</p>
+                  ) : (
+                    <div className="ordersList">
+                      {orders.map(order => {
+                        const isDelivered = order.status.toLowerCase() === 'delivered';
+                        const isCancelled = order.status.toLowerCase() === 'cancelled';
+                        const canCancel = !isDelivered && !isCancelled;
+                        const canTrack = !isCancelled;
 
-                      return (
-                        <div key={order.id} className="orderCard">
-                          <div className="orderHeader">
-                            <div>
-                              <h4>{order.id}</h4>
-                              <p className="orderDate">{new Date(order.date).toLocaleDateString()}</p>
+                        return (
+                          <div key={order._id} className="orderCard">
+                            <div className="orderHeader">
+                              <div>
+                                <h4>Order ID: {order._id}</h4>
+                                <p className="orderDate">{new Date(order.createdAt).toLocaleDateString()}</p>
+                              </div>
+                              <span className={`orderStatus status-${order.status.toLowerCase()}`}>
+                                {order.status.toUpperCase()}
+                              </span>
                             </div>
-                            <span className={`orderStatus status-${order.status.toLowerCase()}`}>
-                              {order.status.toUpperCase()}
-                            </span>
-                          </div>
 
-                          <div className="orderItems">
-                            <h5>ORDER ITEMS:</h5>
-                            <div className="orderItemsList">
-                              {order.items.map(item => (
-                                <div key={`${order.id}-${item.id}`} className="orderItem">
-                                  <div className="orderItemImage">
-                                    <img src={item.image} alt={item.name} />
+                            <div className="orderItems">
+                              <h5>ORDER ITEMS:</h5>
+                              <div className="orderItemsList">
+                                {order.items.map(item => (
+                                  <div key={item._id} className="orderItem">
+                                    <div className="orderItemImage">
+                                      <img
+                                        src={item.product.images && item.product.images.length > 0
+                                          ? `http://localhost:5000${item.product.images[0]}`
+                                          : 'https://via.placeholder.com/100'}
+                                        alt={item.product.name}
+                                      />
+                                    </div>
+                                    <div className="orderItemDetails">
+                                      <p className="itemName">{item.product.name}</p>
+                                      <p className="itemCategory">{item.product.category?.name}</p>
+                                      <p className="itemPrice">${item.price.toFixed(2)} × {item.quantity}</p>
+                                    </div>
+                                    <div className="orderItemTotal">
+                                      ${(item.price * item.quantity).toFixed(2)}
+                                    </div>
                                   </div>
-                                  <div className="orderItemDetails">
-                                    <p className="itemName">{item.name}</p>
-                                    <p className="itemCategory">{item.category}</p>
-                                    <p className="itemPrice">${item.price.toFixed(2)} × {item.quantity}</p>
-                                  </div>
-                                  <div className="orderItemTotal">
-                                    ${(item.price * item.quantity).toFixed(2)}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="orderDetails">
-                            <div className="orderDetailRow">
-                              <span>TOTAL ITEMS:</span>
-                              <span>{order.items.reduce((total, item) => total + item.quantity, 0)} items</span>
-                            </div>
-                            <div className="orderDetailRow">
-                              <span>ORDER TOTAL:</span>
-                              <span className="orderTotal">${order.total.toFixed(2)}</span>
-                            </div>
-                          </div>
-
-                          <div className="orderActions">
-                            {canCancel && (
-                              <button
-                                onClick={() => handleCancelOrder(order.id)}
-                                className="cancelOrderButton"
-                              >
-                                CANCEL ORDER
-                              </button>
-                            )}
-
-                            {canTrack && (
-                              <button
-                                onClick={() => handleTrackOrder(order.id)}
-                                className="trackOrderButton"
-                                disabled={isDelivered}
-                              >
-                                {isDelivered ? 'DELIVERED' : 'TRACK ORDER'}
-                              </button>
-                            )}
-
-                            {isCancelled && (
-                              <button
-                                className="orderCancelledButton"
-                                disabled
-                              >
-                                ORDER CANCELLED
-                              </button>
-                            )}
-                          </div>
-                          {!isCancelled && (
-                            <div className="orderStatusTimeline">
-                              <h5>ORDER STATUS:</h5>
-                              <div className="timeline">
-                                <div className={`timeline-step ${order.status !== 'Cancelled' ? 'completed' : ''}`}>
-                                  <div className="timeline-dot"></div>
-                                  <span>Order Placed</span>
-                                </div>
-                                <div className={`timeline-step ${['Shipped', 'Delivered'].includes(order.status) ? 'completed' : ''}`}>
-                                  <div className="timeline-dot"></div>
-                                  <span>Shipped</span>
-                                </div>
-                                <div className={`timeline-step ${order.status === 'Delivered' ? 'completed' : ''}`}>
-                                  <div className="timeline-dot"></div>
-                                  <span>Delivered</span>
-                                </div>
+                                ))}
                               </div>
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+
+                            <div className="orderDetails">
+                              <div className="orderDetailRow">
+                                <span>TOTAL ITEMS:</span>
+                                <span>{order.items.reduce((total, item) => total + item.quantity, 0)} items</span>
+                              </div>
+                              <div className="orderDetailRow">
+                                <span>ORDER TOTAL:</span>
+                                <span className="orderTotal">${order.total.toFixed(2)}</span>
+                              </div>
+                            </div>
+
+                            <div className="orderActions">
+                              {canCancel && (
+                                <button
+                                  onClick={() => handleCancelOrder(order._id)}
+                                  className="cancelOrderButton"
+                                >
+                                  CANCEL ORDER
+                                </button>
+                              )}
+
+                              {canTrack && (
+                                <button
+                                  onClick={() => handleTrackOrder(order._id)}
+                                  className="trackOrderButton"
+                                  disabled={isDelivered}
+                                >
+                                  {isDelivered ? 'DELIVERED' : 'TRACK ORDER'}
+                                </button>
+                              )}
+
+                              {isCancelled && (
+                                <button
+                                  className="orderCancelledButton"
+                                  disabled
+                                >
+                                  ORDER CANCELLED
+                                </button>
+                              )}
+                            </div>
+                            {!isCancelled && (
+                              <div className="orderStatusTimeline">
+                                <h5>ORDER STATUS:</h5>
+                                <div className="timeline">
+                                  <div className={`timeline-step ${order.status !== 'cancelled' ? 'completed' : ''}`}>
+                                    <div className="timeline-dot"></div>
+                                    <span>Order Placed</span>
+                                  </div>
+                                  <div className={`timeline-step ${['shipped', 'delivered'].includes(order.status) ? 'completed' : ''}`}>
+                                    <div className="timeline-dot"></div>
+                                    <span>Shipped</span>
+                                  </div>
+                                  <div className={`timeline-step ${order.status === 'delivered' ? 'completed' : ''}`}>
+                                    <div className="timeline-dot"></div>
+                                    <span>Delivered</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
