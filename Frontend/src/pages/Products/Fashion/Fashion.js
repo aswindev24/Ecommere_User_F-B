@@ -1,27 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../../common/Header';
 import Footer from '../../../common/Footer';
-// import './Fashion.css';
 import { useNavigate } from 'react-router-dom';
-import FashionFilter from './FashionFilter';
 import axios from 'axios';
 
 const Fashion = () => {
-  const [filters, setFilters] = useState({
-    priceRange: 'all',
-    brand: 'all',
-    category: 'all',
-    size: 'all',
-    color: 'all',
-    sortBy: 'featured'
-  });
-
+  const [activeSubCategory, setActiveSubCategory] = useState('all');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
   const [notification, setNotification] = useState('');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('featured');
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,14 +32,6 @@ const Fashion = () => {
 
     fetchProducts();
   }, []);
-
-  const handleFilterChange = (filterType, value) => {
-    console.log('Filter changed:', filterType, value); // Debug log
-    setFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
-  };
 
   const handleAddToCart = async (product, e) => {
     e.stopPropagation();
@@ -83,76 +65,68 @@ const Fashion = () => {
     navigate(`/productdetail/${productId}`);
   };
 
+  // Get unique subcategories with counts
+  const getSubCategoriesWithCounts = () => {
+    const counts = products.reduce((acc, product) => {
+      const subCatName = product.subCategory ? product.subCategory.name : 'Other';
+      acc[subCatName] = (acc[subCatName] || 0) + 1;
+      return acc;
+    }, {});
+
+    return [
+      { name: 'all', count: products.length },
+      ...Object.entries(counts).map(([name, count]) => ({ name, count }))
+    ];
+  };
+
+  const subCategories = getSubCategoriesWithCounts();
+
+  // Get filtered and sorted products
   const getFilteredProducts = () => {
     let filtered = [...products];
 
-    console.log('Current filters:', filters); // Debug log
-
-    // Filter by price range
-    if (filters.priceRange !== 'all') {
-      filtered = filtered.filter(product => {
-        if (filters.priceRange === 'under50') return product.price < 50;
-        if (filters.priceRange === '50-100') return product.price >= 50 && product.price <= 100;
-        if (filters.priceRange === '100-150') return product.price > 100 && product.price <= 150;
-        if (filters.priceRange === 'over150') return product.price > 150;
-        return true;
-      });
+    // Filter by subcategory
+    if (activeSubCategory !== 'all') {
+      filtered = filtered.filter(product =>
+        product.subCategory && product.subCategory.name === activeSubCategory
+      );
     }
 
-    // Filter by brand
-    if (filters.brand !== 'all') {
-      // filtered = filtered.filter(product => product.brand === filters.brand);
-    }
-
-    // Filter by category
-    if (filters.category !== 'all') {
-      filtered = filtered.filter(product => product.subCategory && product.subCategory.name === filters.category);
-    }
-
-    // Filter by size
-    if (filters.size !== 'all') {
-      // filtered = filtered.filter(product => product.size && product.size.includes(filters.size));
-    }
-
-    // Filter by color
-    if (filters.color !== 'all') {
-      // filtered = filtered.filter(product => product.color === filters.color);
+    // Filter by search query
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(query) ||
+        (product.description && product.description.toLowerCase().includes(query)) ||
+        (product.brand && product.brand.toLowerCase().includes(query))
+      );
     }
 
     // Sort products
-    if (filters.sortBy === 'price-low') {
+    if (sortBy === 'price-low') {
       filtered.sort((a, b) => a.price - b.price);
-    } else if (filters.sortBy === 'price-high') {
+    } else if (sortBy === 'price-high') {
       filtered.sort((a, b) => b.price - a.price);
     }
-    // else if (filters.sortBy === 'rating') {
-    //   filtered.sort((a, b) => b.rating - a.rating);
-    // }
 
-    console.log('Filtered products count:', filtered.length); // Debug log
     return filtered;
   };
 
   const filteredProducts = getFilteredProducts();
 
-  // Group by SubCategory
-  const groupedProducts = filteredProducts.reduce((acc, product) => {
-    const subCatName = product.subCategory ? product.subCategory.name : 'Other';
-    if (!acc[subCatName]) acc[subCatName] = [];
-    acc[subCatName].push(product);
-    return acc;
-  }, {});
-
-  const clearAllFilters = () => {
-    setFilters({
-      priceRange: 'all',
-      brand: 'all',
-      category: 'all',
-      size: 'all',
-      color: 'all',
-      sortBy: 'featured'
-    });
+  // Get tab color based on index
+  const getTabColor = (index) => {
+    const colors = ['blue', 'pink', 'green', 'purple', 'orange', 'indigo'];
+    return colors[index % colors.length];
   };
+
+  const getActiveColor = () => {
+    const index = subCategories.findIndex(cat => cat.name === activeSubCategory);
+    return getTabColor(index);
+  };
+
+  const activeColor = getActiveColor();
+  const activeTabIndex = subCategories.findIndex(cat => cat.name === activeSubCategory);
 
   if (loading) return <div className="electronics">Loading...</div>;
   if (error) return <div className="electronics">{error}</div>;
@@ -161,7 +135,6 @@ const Fashion = () => {
     <div className="electronics">
       <Header />
 
-      {/* Notification */}
       {notification && (
         <div className="notification">
           {notification}
@@ -169,146 +142,222 @@ const Fashion = () => {
       )}
 
       <div className="electronicsMain">
-        {/* Left Sidebar - Filters */}
-        <div className="electronics__left">
-          <FashionFilter
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={clearAllFilters}
-          />
-        </div>
+        <div className="electronics__right" style={{ width: '100%' }}>
+          <div style={{ marginBottom: '0' }}>
 
-        {/* Right Content - Products Grid */}
-        <div className="electronics__right">
-          <div className="electronicsHeader">
-            <div className="electronicsBreadcrumbLink">
-              <a href="/">HOME</a> / <span>FASHION</span>
-            </div>
-            <div className="filterLeft" onClick={() => setIsDrawerOpen(true)}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-              <p>MENU</p>
+
+            {/* Page Title */}
+            <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+              Fashion Dresses
+            </h1>
+
+            {/* Subcategory Tabs */}
+            <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+              {subCategories.map((subCat, index) => {
+                const color = getTabColor(index);
+                const isActive = activeSubCategory === subCat.name;
+
+                return (
+                  <button
+                    key={subCat.name}
+                    onClick={() => setActiveSubCategory(subCat.name)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      borderTopLeftRadius: '0.5rem',
+                      borderTopRightRadius: '1.5rem',
+                      borderBottomLeftRadius: '0',
+                      borderBottomRightRadius: '0',
+                      borderLeft: isActive ? `2px solid var(--${color}-500, #323436ff)` : '2px solid transparent',
+                      borderRight: isActive ? `2px solid var(--${color}-500, #323436ff)` : '2px solid transparent',
+                      borderTop: isActive ? `2px solid var(--${color}-500, #323436ff)` : '2px solid transparent',
+                      borderBottom: isActive ? '2px solid white' : '2px solid transparent',
+                      backgroundColor: isActive ? 'white' : '#eaeff7ff',
+                      color: isActive ? `var(--${color}-600, #323436ff)` : '#6b7280',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      position: 'relative',
+                      zIndex: isActive ? 10 : 1,
+                      textTransform: 'capitalize',
+                      marginBottom: isActive ? '-2px' : '0'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) e.currentTarget.style.backgroundColor = '#eaeff7ff';
+                    }}
+                  >
+                    <span>{subCat.name === 'all' ? 'All' : subCat.name}</span>
+                    <span style={{ marginLeft: '0.5rem', fontSize: '0.875rem' }}>{subCat.count}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Products Header */}
-          <div className="productsHeader">
-            <div>
-              <h1>Fashion Dresses</h1>
-              <p className="productsCount">Showing {filteredProducts.length} dresses</p>
-            </div>
-            <div className="sortOptions">
-              <label>Sort by:</label>
+          {/* Main Container with Connected Border */}
+          <div
+            style={{
+              border: `2px solid var(--${activeColor}-500, #1d3c5aff)`,
+              borderTopLeftRadius: activeTabIndex === 0 ? '0' : '1.75rem',
+              borderTopRightRadius: '0.75rem',
+              borderBottomLeftRadius: '0.75rem',
+              borderBottomRightRadius: '0.75rem',
+              backgroundColor: 'white',
+              padding: '1.5rem',
+              marginTop: '0',
+              transition: 'border-color 0.2s, border-radius 0.2s'
+            }}
+          >
+            {/* Search and Sort Bar */}
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <div style={{
+                flex: '1',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                padding: '0.625rem 1rem',
+                backgroundColor: '#f9fafb',
+                borderRadius: '0.5rem',
+                border: '1px solid #e5e7eb',
+                minWidth: '200px'
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search fashion items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'transparent',
+                    outline: 'none',
+                    border: 'none',
+                    color: '#374151'
+                  }}
+                />
+                {/* Add clear button for search */}
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#9ca3af',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
               <select
-                value={filters.sortBy}
-                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                className="sortSelect"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: '#f9fafb',
+                  borderRadius: '0.5rem',
+                  border: '1px solid #e5e7eb',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  color: '#374151'
+                }}
               >
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="rating">Top Rated</option>
               </select>
             </div>
-          </div>
 
-          {/* Products Grouped by SubCategory */}
-          <div className="productsContainer">
-            {Object.entries(groupedProducts).map(([subCategory, items]) => (
-              <div key={subCategory} className="subCategorySection">
-                <h2 className="subCategoryTitle">{subCategory}</h2>
-                <div className="productsGrid">
-                  {items.map(product => (
-                    <div
-                      key={product._id}
-                      className="productCard"
-                      onClick={() => handleProductClick(product._id)}
-                    >
-                      <div className="productImage">
-                        <img src={product.images && product.images.length > 0 ? `http://localhost:5000${product.images[0]}` : 'https://via.placeholder.com/400'} alt={product.name} />
-                        <div className="productCategory">{product.category.name}</div>
-                        {/* <div className="productColor">{product.color}</div> */}
-                      </div>
-
-                      <div className="productContent">
-                        {/* <div className="productBrand">{product.brand}</div> */}
-                        <h3 className="productTitle">{product.name}</h3>
-
-                        <div className="productRating">
-                          <div className="stars">
-                            {'★'.repeat(4)}
-                            {'☆'.repeat(1)}
-                          </div>
-                          <span className="ratingValue">4.0</span>
-                        </div>
-
-                        {/* 
-                        <div className="productFeatures">
-                          {product.features.slice(0, 2).map((feature, index) => (
-                            <span key={index} className="featureTag">{feature}</span>
-                          ))}
-                        </div>
-                        */}
-
-                        {/* 
-                        <div className="sizeOptions">
-                          <span className="sizeLabel">Sizes: </span>
-                          {product.size.join(', ')}
-                        </div>
-                        */}
-
-                        <div className="productFooter">
-                          <div className="productPrice">${product.price.toFixed(2)}</div>
-                          <button
-                            onClick={(e) => handleAddToCart(product, e)}
-                            className="addToCartButton"
-                          >
-                            ADD TO CART
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {/* Optional: Show search results summary */}
+            {searchQuery && (
+              <div style={{ marginBottom: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                Search results for "{searchQuery}" ({filteredProducts.length} items found)
               </div>
-            ))}
-          </div>
+            )}
 
-          {filteredProducts.length === 0 && (
-            <div className="noProducts">
-              <h3>No dresses found</h3>
-              <p>Try adjusting your filters to see more results.</p>
-              <button
-                onClick={clearAllFilters}
-                className="clearFiltersBtn"
-              >
-                CLEAR ALL FILTERS
-              </button>
+            {/* Products Count */}
+            <div style={{ marginBottom: '1.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
+              Showing {filteredProducts.length} fashion items
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Mobile Drawer */}
-      <div className={`filterDrawer ${isDrawerOpen ? 'open' : ''}`}>
-        <div className="drawerHeader">
-          <p>FILTERS</p>
-          <div className="closeButton" onClick={() => setIsDrawerOpen(false)}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            {/* Products Grid */}
+            <div className="productsGrid">
+              {filteredProducts.map(product => (
+                <div
+                  key={product._id}
+                  className="productCard"
+                  onClick={() => handleProductClick(product._id)}
+                >
+                  <div className="productImage">
+                    <img
+                      src={product.images && product.images.length > 0
+                        ? `http://localhost:5000${product.images[0]}`
+                        : 'https://via.placeholder.com/400'
+                      }
+                      alt={product.name}
+                    />
+
+                  </div>
+
+                  <div className="productContent">
+                    <h3 className="productTitle">{product.name}</h3>
+
+
+
+                    <div className="productFooter">
+                      <div className="productPrice">RS: {product.price.toFixed(2)}</div>
+                      <button
+                        onClick={(e) => handleAddToCart(product, e)}
+                        className="addToCartButton"
+                      >
+                        ADD TO CART
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {filteredProducts.length === 0 && (
+              <div className="noProducts">
+                <h3>No fashion items found</h3>
+                <p>
+                  {searchQuery
+                    ? `No items matching "${searchQuery}" found. Try a different search term.`
+                    : 'Try selecting a different category.'
+                  }
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      marginTop: '0.5rem',
+                      padding: '0.5rem 1rem',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '0.375rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </div>
+            )}
           </div>
-        </div>
-        <div className="drawerContent">
-          <FashionFilter
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={clearAllFilters}
-          />
         </div>
       </div>
 

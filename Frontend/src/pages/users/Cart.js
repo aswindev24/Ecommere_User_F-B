@@ -320,21 +320,21 @@ const Cart = () => {
                 <tbody>
                   <tr>
                     <th>SUBTOTAL</th>
-                    <td>${calculateSubtotal().toFixed(2)}</td>
+                    <td>RS: {calculateSubtotal().toFixed(2)}</td>
                   </tr>
                   {appliedCoupon && (
                     <tr className="discount-row">
                       <th>DISCOUNT</th>
-                      <td>-${calculateDiscount().toFixed(2)}</td>
+                      <td>RS: {calculateDiscount().toFixed(2)}</td>
                     </tr>
                   )}
                   <tr>
                     <th>TAX (8%)</th>
-                    <td>${calculateTax().toFixed(2)}</td>
+                    <td>RS: {calculateTax().toFixed(2)}</td>
                   </tr>
                   <tr>
                     <th>TOTAL</th>
-                    <td>${calculateTotal().toFixed(2)}</td>
+                    <td>RS: {calculateTotal().toFixed(2)}</td>
                   </tr>
                 </tbody>
               </table>

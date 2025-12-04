@@ -145,6 +145,9 @@ const Electronics = () => {
       <div className="electronicsMain">
         <div className="electronics__right" style={{ width: '100%', }}>
           <div style={{ marginBottom: '0' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+              Electronics
+            </h1>
             {/* Subcategory Tabs */}
             <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
               {subCategories.map((subCat, index) => {
