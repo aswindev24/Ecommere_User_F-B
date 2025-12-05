@@ -40,7 +40,7 @@ exports.createOrder = async (req, res) => {
             address: addressId,
             subtotal,
             discount: discount || 0,
-            tax,
+            tax: 0,
             total,
             couponCode: couponCode || null
         });

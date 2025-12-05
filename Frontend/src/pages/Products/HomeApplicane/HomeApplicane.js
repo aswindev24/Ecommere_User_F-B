@@ -4,6 +4,7 @@ import Footer from '../../../common/Footer';
 import './HomeAppliances.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCart } from '../../../context/CartContext';
 
 const HomeAppliances = () => {
   const [activeSubCategory, setActiveSubCategory] = useState('all');
@@ -14,6 +15,7 @@ const HomeAppliances = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { fetchCartCount } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,6 +55,7 @@ const HomeAppliances = () => {
 
       if (response.data.success) {
         setNotification(`${product.name} added to cart!`);
+        fetchCartCount();
         setTimeout(() => setNotification(''), 3000);
       }
     } catch (error) {

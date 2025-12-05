@@ -6,6 +6,7 @@ import Header from '../../common/Header';
 import Footer from '../../common/Footer';
 import RazorpayPayment from '../../components/Payment/RazorpayPayment';
 import CouponSection from '../../common/Coupon';
+import { useCart } from '../../context/CartContext';
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -17,6 +18,7 @@ const Cart = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const { fetchCartCount } = useCart();
 
   const navigate = useNavigate();
 
@@ -66,6 +68,7 @@ const Cart = () => {
       });
       if (response.data.success) {
         setCart(response.data.cart);
+        fetchCartCount();
         showNotification('Item removed from cart');
       }
     } catch (err) {
@@ -85,6 +88,7 @@ const Cart = () => {
       );
       if (response.data.success) {
         setCart(response.data.cart);
+        fetchCartCount();
       }
     } catch (err) {
       console.error('Error updating quantity:', err);
@@ -102,14 +106,8 @@ const Cart = () => {
     return appliedCoupon.discountAmount;
   };
 
-  const calculateTax = () => {
-    const subtotal = calculateSubtotal();
-    const discount = calculateDiscount();
-    return (subtotal - discount) * 0.08;
-  };
-
   const calculateTotal = () => {
-    return calculateSubtotal() - calculateDiscount() + calculateTax();
+    return calculateSubtotal() - calculateDiscount();
   };
 
   const handleCouponApplied = (coupon) => {
@@ -144,6 +142,7 @@ const Cart = () => {
 
   const handlePaymentSuccess = (order) => {
     setShowPaymentModal(false);
+    fetchCartCount();
     showNotification('Payment successful! Order placed.');
     setTimeout(() => {
       navigate('/profile');
@@ -329,10 +328,6 @@ const Cart = () => {
                     </tr>
                   )}
                   <tr>
-                    <th>TAX (8%)</th>
-                    <td>RS: {calculateTax().toFixed(2)}</td>
-                  </tr>
-                  <tr>
                     <th>TOTAL</th>
                     <td>RS: {calculateTotal().toFixed(2)}</td>
                   </tr>
@@ -358,7 +353,7 @@ const Cart = () => {
             addressId: selectedAddressId,
             subtotal: calculateSubtotal(),
             discount: calculateDiscount(),
-            tax: calculateTax(),
+            tax: 0,
             total: calculateTotal(),
             couponCode: appliedCoupon ? appliedCoupon.code : null
           }}

@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import { Toaster } from "react-hot-toast";
 import PrivateRoute from "./components/PrivateRoute";
 import Home from "./pages/users/Home";
@@ -19,37 +20,39 @@ import Fashion from "./pages/Products/Fashion/Fashion";
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/affiliate" element={<Affiliate />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <PrivateRoute>
-                <Cart />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/electronics" element={<Electronics />} />
-          <Route path="/homeappliances" element={<HomeAppliances />} />
-          <Route path="/fashion" element={<Fashion />} />
-          <Route path="/productdetail/:productId" element={<ProductDetail />} />
-        </Routes>
-      </Router>
+      <CartProvider>
+        <Router>
+          <Toaster position="top-right" />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/affiliate" element={<Affiliate />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                <PrivateRoute>
+                  <Cart />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/electronics" element={<Electronics />} />
+            <Route path="/homeappliances" element={<HomeAppliances />} />
+            <Route path="/fashion" element={<Fashion />} />
+            <Route path="/productdetail/:productId" element={<ProductDetail />} />
+          </Routes>
+        </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }

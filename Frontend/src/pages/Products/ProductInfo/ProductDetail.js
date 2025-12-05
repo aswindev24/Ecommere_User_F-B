@@ -4,10 +4,12 @@ import Header from '../../../common/Header';
 import Footer from '../../../common/Footer';
 import './ProductDetail.css';
 import axios from 'axios';
+import { useCart } from '../../../context/CartContext';
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { fetchCartCount } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,6 +57,7 @@ const ProductDetail = () => {
 
       if (response.data.success) {
         setNotification(`${product.name} added to cart!`);
+        fetchCartCount();
         setTimeout(() => setNotification(''), 3000);
       }
     } catch (error) {

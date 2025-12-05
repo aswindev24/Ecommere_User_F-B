@@ -3,6 +3,7 @@ import Header from '../../../common/Header';
 import Footer from '../../../common/Footer';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCart } from '../../../context/CartContext';
 
 const Fashion = () => {
   const [activeSubCategory, setActiveSubCategory] = useState('all');
@@ -13,6 +14,7 @@ const Fashion = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { fetchCartCount } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -52,6 +54,7 @@ const Fashion = () => {
 
       if (response.data.success) {
         setNotification(`${product.name} added to cart!`);
+        fetchCartCount();
         setTimeout(() => setNotification(''), 3000);
       }
     } catch (error) {

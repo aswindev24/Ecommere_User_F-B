@@ -4,6 +4,7 @@ import Footer from '../../../common/Footer';
 import './Electronics.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCart } from '../../../context/CartContext';
 
 const Electronics = () => {
   const [activeSubCategory, setActiveSubCategory] = useState('all');
@@ -14,6 +15,7 @@ const Electronics = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState(''); // Add this state
   const navigate = useNavigate();
+  const { fetchCartCount } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,6 +55,7 @@ const Electronics = () => {
 
       if (response.data.success) {
         setNotification(`${product.name} added to cart!`);
+        fetchCartCount();
         setTimeout(() => setNotification(''), 3000);
       }
     } catch (error) {
